@@ -10,11 +10,100 @@ Opt("PixelCoordMode", 0)
 ; Set window Mode for MouseClick
 Opt("MouseCoordMode", 0)
 
+#comments-start
+; GUI
+#include <ButtonConstants.au3>
+#include <ComboConstants.au3>
+#include <EditConstants.au3>
+#include <GUIConstantsEx.au3>
+#include <StaticConstants.au3>
+#include <WindowsConstants.au3>
+
+$IdleSlayerBot = GUICreate("Idle Slayer Bot", 805, 605, 199, 145)
+GUISetBkColor(0x696969)
+; Create BonusStage GroupBox
+$GroupBonusStage = GUICtrlCreateGroup("Bonus Stage", 16, 8, 185, 81, BitOR($GUI_SS_DEFAULT_GROUP,$BS_FLAT))
+GUICtrlSetFont(-1, 11, 800, 0, "MS Sans Serif")
+; Create Checkbox Hardmode
+$CheckBoxHardmode = GUICtrlCreateCheckbox("Hardmode", 32, 32, 97, 17)
+GUICtrlSetFont(-1, 10, 400, 0, "MS Sans Serif")
+; Create Checkbox Silver Death
+$CheckBoxSilverDeath = GUICtrlCreateCheckbox("Silver Death", 32, 56, 97, 17)
+GUICtrlSetFont(-1, 10, 400, 0, "MS Sans Serif")
+GUICtrlCreateGroup("", -99, -99, 1, 1)
+
+; Create Chesthunt GroupBox
+$GroupChesthunt = GUICtrlCreateGroup("Chesthunt", 16, 96, 185, 81, BitOR($GUI_SS_DEFAULT_GROUP,$BS_FLAT))
+GUICtrlSetFont(-1, 11, 800, 0, "MS Sans Serif")
+; Create Checkbox LockPicking100
+$CheckBoxLockPicking100 = GUICtrlCreateCheckbox("Lock Picking 100", 32, 144, 150, 17)
+GUICtrlSetFont(-1, 10, 400, 0, "MS Sans Serif")
+; Create Checkbox Chesthunt
+$CheckBoxChesthunt = GUICtrlCreateCheckbox("Enable Chesthunt", 32, 120, 150, 17)
+GUICtrlSetFont(-1, 10, 400, 0, "MS Sans Serif")
+GUICtrlCreateGroup("", -99, -99, 1, 1)
+
+; Create Upgrades GroupBox
+$GroupUpgrades = GUICtrlCreateGroup("Upgrades", 16, 184, 185, 81, BitOR($GUI_SS_DEFAULT_GROUP,$BS_FLAT))
+GUICtrlSetFont(-1, 11, 800, 0, "MS Sans Serif")
+; Create Checkbox Auto Buy Equipment
+$CheckBoxEquipment = GUICtrlCreateCheckbox("Auto Buy Equipment", 32, 208, 150, 17)
+GUICtrlSetFont(-1, 10, 400, 0, "MS Sans Serif")
+; Create Checkbox Auto Buy Upgrades
+$CheckBoxUpgrades = GUICtrlCreateCheckbox("Auto Buy Upgrades", 32, 232, 150, 17)
+GUICtrlSetFont(-1, 10, 400, 0, "MS Sans Serif")
+GUICtrlCreateGroup("", -99, -99, 1, 1)
+
+; Create Label and Combobox Bonus Stage Selection
+$Combo1 = GUICtrlCreateCombo("Combo1", 384, 16, 65, 28, BitOR($CBS_DROPDOWN,$CBS_AUTOHSCROLL))
+$BonusStageSelection = GUICtrlCreateLabel("Bonus Stage Selection", 232, 16, 150, 20)
+GUICtrlSetFont(-1, 11, 400, 0, "MS Sans Serif")
+
+; Create Buttons
+$ButtonStart = GUICtrlCreateButton("Start", 16, 336, 75, 25, $BS_FLAT)
+$ButtonPause = GUICtrlCreateButton("Pause", 96, 336, 75, 25, $BS_FLAT)
+$ButtonStop = GUICtrlCreateButton("Stop", 176, 336, 75, 25, $BS_FLAT)
+
+; Create Console Edit
+$EditConsole = GUICtrlCreateEdit("", 16, 368, 769, 217, BitOR($ES_AUTOVSCROLL,$ES_WANTRETURN,$WS_VSCROLL), 0)
+GUICtrlSetData(-1, "editconsole")
+GUICtrlSetColor(-1, 0xFFFFFF)
+GUICtrlSetBkColor(-1, 0x000000)
+
+; Create KeyConfig Edit
+$KeyConfig = GUICtrlCreateEdit("", 600, 28, 185, 273, BitOR($ES_AUTOVSCROLL,$ES_WANTRETURN,$WS_VSCROLL), 0)
+GUICtrlSetData(-1, "KeyConfig")
+GUICtrlSetBkColor(-1, 0xC8C8C8)
+; Create KeyConfig Label
+$KeyConfigLabel = GUICtrlCreateLabel("Key Config", 600, 8, 185, 20, $SS_CENTER)
+GUICtrlSetFont(-1, 11, 800, 0, "MS Sans Serif")
+GUICtrlSetBkColor(-1, 0xC8C8C8)
+GUISetState(@SW_SHOW)
+
+; Create Globals for Checkboxes
+Global $Hardmode = False
+Global $SilverDeath = False
+Global $Chesthunt = False
+Global $Lockpicking100 = False
+Global $BuyEquipment = False
+Global $BuyUpgrades = False
+#comments-end
+
+
 ; Infinite Loop
 While 1
 	ControlFocus("Idle Slayer", "", "")
 	ControlSend("Idle Slayer", "", "", "{Up}{Right}{e}")
 	Sleep(150)
+
+	#comments-start
+	$nMsg = GUIGetMsg()
+	Switch $nMsg
+		Case $GUI_EVENT_CLOSE
+			Exit
+
+	EndSwitch
+	#comments-end
 
 	; Silver box collect
 	PixelSearch(580, 40, 580, 40, 0xFF0000)
