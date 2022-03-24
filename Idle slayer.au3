@@ -3,6 +3,8 @@
  Author:         Devil4ngle
 #comments-end
 
+#include <AutoItConstants.au3>
+
 ; Disable Caps for better background
 Opt("SendCapslockMode", 0)
 ; Set window Mode for PixelSearch
@@ -10,103 +12,43 @@ Opt("PixelCoordMode", 0)
 ; Set window Mode for MouseClick
 Opt("MouseCoordMode", 0)
 
-#comments-start
-; GUI
-#include <ButtonConstants.au3>
-#include <ComboConstants.au3>
-#include <EditConstants.au3>
-#include <GUIConstantsEx.au3>
-#include <StaticConstants.au3>
-#include <WindowsConstants.au3>
+HotKeySet("{F6}", "StartScript")
+HotKeySet("{F4}", "StopScript")
 
-$IdleSlayerBot = GUICreate("Idle Slayer Bot", 805, 605, 199, 145)
-GUISetBkColor(0x696969)
-; Create BonusStage GroupBox
-$GroupBonusStage = GUICtrlCreateGroup("Bonus Stage", 16, 8, 185, 81, BitOR($GUI_SS_DEFAULT_GROUP,$BS_FLAT))
-GUICtrlSetFont(-1, 11, 800, 0, "MS Sans Serif")
-; Create Checkbox Hardmode
-$CheckBoxHardmode = GUICtrlCreateCheckbox("Hardmode", 32, 32, 97, 17)
-GUICtrlSetFont(-1, 10, 400, 0, "MS Sans Serif")
-; Create Checkbox Silver Death
-$CheckBoxSilverDeath = GUICtrlCreateCheckbox("Silver Death", 32, 56, 97, 17)
-GUICtrlSetFont(-1, 10, 400, 0, "MS Sans Serif")
-GUICtrlCreateGroup("", -99, -99, 1, 1)
-
-; Create Chesthunt GroupBox
-$GroupChesthunt = GUICtrlCreateGroup("Chesthunt", 16, 96, 185, 81, BitOR($GUI_SS_DEFAULT_GROUP,$BS_FLAT))
-GUICtrlSetFont(-1, 11, 800, 0, "MS Sans Serif")
-; Create Checkbox LockPicking100
-$CheckBoxLockPicking100 = GUICtrlCreateCheckbox("Lock Picking 100", 32, 144, 150, 17)
-GUICtrlSetFont(-1, 10, 400, 0, "MS Sans Serif")
-; Create Checkbox Chesthunt
-$CheckBoxChesthunt = GUICtrlCreateCheckbox("Enable Chesthunt", 32, 120, 150, 17)
-GUICtrlSetFont(-1, 10, 400, 0, "MS Sans Serif")
-GUICtrlCreateGroup("", -99, -99, 1, 1)
-
-; Create Upgrades GroupBox
-$GroupUpgrades = GUICtrlCreateGroup("Upgrades", 16, 184, 185, 81, BitOR($GUI_SS_DEFAULT_GROUP,$BS_FLAT))
-GUICtrlSetFont(-1, 11, 800, 0, "MS Sans Serif")
-; Create Checkbox Auto Buy Equipment
-$CheckBoxEquipment = GUICtrlCreateCheckbox("Auto Buy Equipment", 32, 208, 150, 17)
-GUICtrlSetFont(-1, 10, 400, 0, "MS Sans Serif")
-; Create Checkbox Auto Buy Upgrades
-$CheckBoxUpgrades = GUICtrlCreateCheckbox("Auto Buy Upgrades", 32, 232, 150, 17)
-GUICtrlSetFont(-1, 10, 400, 0, "MS Sans Serif")
-GUICtrlCreateGroup("", -99, -99, 1, 1)
-
-; Create Label and Combobox Bonus Stage Selection
-$Combo1 = GUICtrlCreateCombo("Combo1", 384, 16, 65, 28, BitOR($CBS_DROPDOWN,$CBS_AUTOHSCROLL))
-$BonusStageSelection = GUICtrlCreateLabel("Bonus Stage Selection", 232, 16, 150, 20)
-GUICtrlSetFont(-1, 11, 400, 0, "MS Sans Serif")
-
-; Create Buttons
-$ButtonStart = GUICtrlCreateButton("Start", 16, 336, 75, 25, $BS_FLAT)
-$ButtonPause = GUICtrlCreateButton("Pause", 96, 336, 75, 25, $BS_FLAT)
-$ButtonStop = GUICtrlCreateButton("Stop", 176, 336, 75, 25, $BS_FLAT)
-
-; Create Console Edit
-$EditConsole = GUICtrlCreateEdit("", 16, 368, 769, 217, BitOR($ES_AUTOVSCROLL,$ES_WANTRETURN,$WS_VSCROLL), 0)
-GUICtrlSetData(-1, "editconsole")
-GUICtrlSetColor(-1, 0xFFFFFF)
-GUICtrlSetBkColor(-1, 0x000000)
-
-; Create KeyConfig Edit
-$KeyConfig = GUICtrlCreateEdit("", 600, 28, 185, 273, BitOR($ES_AUTOVSCROLL,$ES_WANTRETURN,$WS_VSCROLL), 0)
-GUICtrlSetData(-1, "KeyConfig")
-GUICtrlSetBkColor(-1, 0xC8C8C8)
-; Create KeyConfig Label
-$KeyConfigLabel = GUICtrlCreateLabel("Key Config", 600, 8, 185, 20, $SS_CENTER)
-GUICtrlSetFont(-1, 11, 800, 0, "MS Sans Serif")
-GUICtrlSetBkColor(-1, 0xC8C8C8)
-GUISetState(@SW_SHOW)
-
-; Create Globals for Checkboxes
-Global $Hardmode = False
-Global $SilverDeath = False
-Global $Chesthunt = False
-Global $Lockpicking100 = False
-Global $BuyEquipment = False
-Global $BuyUpgrades = False
-#comments-end
-
+Global $run = 1
+Global $buyUpgrades = False
 
 ; Infinite Loop
-While 1
+While $run
+	;Jump and shoot
 	ControlFocus("Idle Slayer", "", "")
-	ControlSend("Idle Slayer", "", "", "{Up}{Right}{e}")
+	ControlSend("Idle Slayer", "", "", "{Up}{Right}")
 	Sleep(150)
 
-	#comments-start
-	$nMsg = GUIGetMsg()
-	Switch $nMsg
-		Case $GUI_EVENT_CLOSE
-			Exit
+	; Rage
+	PixelSearch(1103, 115, 1103, 115, 0x990306)
+	If Not @error Then
+		Sleep(2000)
+		MouseClick("left", 1104, 112, 1, 0)
+		Sleep(300)
+		$buyUpgrades = True
+	EndIf
 
-	EndSwitch
-	#comments-end
+	; Upgrades
+	If $buyUpgrades Then
+		MouseClick("left", 1171, 683, 1, 0)
+
+		; Check if bag is open
+		PixelSearch(1222, 657, 1222, 657, 0xA61010, 10)
+		If Not @error Then
+			Sleep(300)
+			BuyEquipment()
+			$buyUpgrades = False
+		EndIf
+	EndIf
 
 	; Silver box collect
-	PixelSearch(580, 40, 580, 40, 0xFF0000)
+	PixelSearch(650, 36, 650, 36, 0xFFC000)
 	If Not @error Then
 		MouseClick("left", 644, 49, 1, 0)
 	EndIf
@@ -116,7 +58,6 @@ While 1
 	If Not @error Then
 		Chesthunt()
 	EndIf
-
 
 	; Collect minions
 	PixelSearch(99, 113, 99, 113, 0xFFFF7A)
@@ -130,6 +71,107 @@ While 1
 		BonusStage()
 	EndIf
 WEnd
+
+Func BuyEquipment()
+	; Navigate to Equipment pick Max and scroll up
+	MouseClick("left", 859, 686, 1, 0)
+	Sleep(300)
+	MouseClick("left", 1187, 612, 1, 0)
+	Sleep(300)
+	MouseWheel($MOUSE_WHEEL_UP, 50)
+	Sleep(300)
+	
+	; Check for buyable equipment
+	$loopCount = 1
+	While $loopCount < 5 And $run
+		$location = PixelSearch(1160, 170, 1160, 590, 0x11AA23)
+		If @error Then
+			MouseWheel($MOUSE_WHEEL_DOWN, 10)
+			$loopCount += 1
+			Sleep(300)
+		EndIf
+
+		If IsArray($location) = 1 Then
+			MouseClick("left", $location[0], $location[1], 1, 0)
+			Sleep(300)
+		EndIf
+	WEnd
+
+	MouseWheel($MOUSE_WHEEL_UP, 50)
+	Sleep(300)
+	BuyUpgrades()
+EndFunc
+
+Func BuyUpgrades()
+	; Navigate to upgrade and scroll up
+	MouseClick("left", 927, 683, 1, 0)
+	Sleep(300)
+	MouseWheel($MOUSE_WHEEL_UP, 50)
+	Sleep(300)
+
+	$runWhile = 1
+	$somethingBought = False
+
+	While $runWhile And $run
+		$RB_Magnet_Found = False
+		$SRB_Magnet_Found = False
+
+		; Check if RandomBox Magnet is next upgrade
+		PixelSearch(882, 195, 909, 223, 0xF4B41B)
+		If Not @error Then
+			$RB_Magnet_Found = True
+		EndIf
+
+		; Check if Specifal RandomBox Magnet is next upgrade
+		PixelSearch(879, 288, 913, 322, 0xE478FF)
+		If Not @error Then
+			$SRB_Magnet_Found = True
+		EndIf
+
+		; Click upgrade depending if Magnets are buyable
+		If $RB_Magnet_Found Then
+			If $SRB_Magnet_Found Then
+				PixelSearch(1150, 369, 1238, 439, 0x11AA23, 10)
+				If @error Then
+					$runWhile = 0
+					ContinueLoop
+				EndIf
+
+				MouseClick("left", 1185, 395, 1, 0)
+				$somethingBought = True
+				Sleep(300)
+			Else
+				PixelSearch(1150, 275, 1238, 340, 0x11AA23, 10)
+				If @error Then
+					$runWhile = 0
+					ContinueLoop
+				EndIf
+
+				MouseClick("left", 1185, 297, 1, 0)
+				$somethingBought = True
+				Sleep(300)
+			EndIf
+		Else
+			PixelSearch(1150, 178, 1238, 239, 0x11AA23, 10)
+			If @error Then
+				$runWhile = 0
+				ContinueLoop
+			EndIf
+
+			MouseClick("left", 1185, 202, 1, 0)
+			$somethingBought = True
+			Sleep(300)
+		EndIf
+	Wend
+
+	If $somethingBought Then
+		BuyEquipment()
+	Else
+		MouseClick("left", 1222, 677, 1, 0)
+		Sleep(300)
+		MouseMove(623, 353)
+	EndIf
+EndFunc
 
 Func CollectMinion()
 	MouseClick("left", 95, 90, 1, 0)
@@ -297,7 +339,7 @@ Func BonusStageNSP()
 	cSend(31, 1000)
 	; Section 2 sync
 	Do
-		PixelSearch(700, 149, 700, 149, 0x7A444A)
+		PixelSearch(780, 536, 780, 536, 0xBB26DF)
 	Until Not @error
 	; Section 2 start
 	cSend(156, 719) ;1
@@ -311,21 +353,23 @@ Func BonusStageNSP()
 	cSend(31, 672) ;9
 	cSend(515, 1344) ;10
 	cSend(484, 297) ;11
-	cSend(78, 1297) ;12
-	cSend(156, 813) ;13
-	cSend(172, 984) ;14
-	cSend(31, 625) ;15
-	cSend(610, 1890) ;16
-	cSend(469, 219) ;17
-	cSend(297, 1000) ;18
-	cSend(156, 1531) ;19
-	cSend(110, 1390) ;20
-	cSend(360, 5984) ;21
+
+	cSend(406, 859) ;12
+	cSend(78, 1203) ;13
+	cSend(94, 922) ;14
+	cSend(109, 954) ;15
+	cSend(31, 672) ;16
+	cSend(515, 1344) ;17
+	cSend(469, 219) ;18
+	cSend(297, 1000) ;19
+	cSend(156, 1531) ;20
+	cSend(110, 3000) ;21
+	cSend(360, 2984) ;22
+	cSend(531, 2313) ;23
 	If BonusStageFail() Then
 		Return
 	EndIf
 	; Section 2 Collection
-	cSend(531, 2313)
 	cSend(344, 1234)
 	cSend(62, 454)
 	cSend(62, 1125)
@@ -356,24 +400,25 @@ Func BonusStageNSP()
 	cSend(94, 344)
 	cSend(78, 359)
 	cSend(78, 3453)
-	cSend(63, 9062)
+	cSend(63, 8862)
 	;Section 4 Start
 	cSend(32, 4578) ;1
-	cSend(31, 859) ;2
-	cSend(47, 1375) ;3
-	cSend(47, 1406) ;4
-	cSend(641, 703) ;5
-	cSend(31, 1344) ;6
-	cSend(47, 1484) ;7
-	cSend(578, 766) ;8
-	cSend(31, 1407) ;9
-	cSend(31, 1437) ;10
-	cSend(563, 719) ;11
-	cSend(46, 1438) ;12
-	cSend(47, 1422) ;13
-	cSend(547, 750) ;14
-	cSend(46, 1625) ;15
-	cSend(94, 391) ;16
+	cSend(31, 809) ;2
+	cSend(41, 1375) ;3
+	cSend(41, 1375) ;4
+	cSend(641, 690) ;5
+	cSend(41, 1375) ;6
+	cSend(41, 1375) ;7
+	cSend(641, 690) ;8
+	cSend(41, 1375) ;9
+	cSend(41, 1375) ;10
+	cSend(641, 690) ;11
+	cSend(41, 1375) ;12
+	cSend(41, 1375) ;13
+	cSend(641, 690) ;14
+	cSend(41, 1375) ;15
+	;Section 4 Collection
+	cSend(120, 391) ;16
 	cSend(281, 1391) ;17
 	cSend(109, 2406) ;18
 	cSend(63, 390) ;19
@@ -387,8 +432,17 @@ Func BonusStageNSP()
 EndFunc   ;==>BonusStageNSP
 
 Func cSend($pressDelay, $postPressDelay = 0, $key = "Up")
-	ControlSend("Idle Slayer", "", "", "{" & $key & " Down}")
+	Send("{" & $key & " Down}")
 	Sleep($pressDelay)
-	ControlSend("Idle Slayer", "", "", "{" & $key & " Up}")
+	Send("{" & $key & " Up}")
 	Sleep($postPressDelay)
+	Return
 EndFunc   ;==>cSend
+
+Func StopScript()
+	$run = 0
+EndFunc
+
+Func StartScript()
+	$run = 1
+EndFunc
